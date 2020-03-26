@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Current Inventory
+inventory/hosts
+
+# Random thoughts and tasks
+my_notes.md
+

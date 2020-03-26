@@ -1,0 +1,23 @@
+---
+# Update & Upgrade a fresh box -- Ubuntu | Debian
+
+- hosts: all
+  remote_user: root
+  tasks:
+      - name: Update System Package Cache
+        apt: update_cache=yes
+
+      - name: Upgrade System Packages
+        apt: upgrade=full
+        
+      - name: Make 'generic' user
+        user:
+            name: '{{ deploy_user }}'
+            password: '$6$RUk1P3yT2aG$h5l6iEq7Fup.O96tDK5e8v2ouN.SWIdABIb.tJ3nqf3h3fBjKJnO3x66WQuqMU1cfmFCDewHqVTzs8Jm4EHTZ1'
+            group: sudo
+            state: present
+            shell: /bin/bash
+            createhome: yes
+            home: '/home/{{ deploy_user }}'
+            comment: "Privilaged User"
+            expires: 1209600

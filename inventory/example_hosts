@@ -1,0 +1,31 @@
+# All the IPs of the hosts that will be used for this Kubernetes deployment
+# one controller where kubespray will be deployed from
+# Seven node cluster with three masters
+
+[controller]
+172.16.3.100
+
+[masters]
+172.16.3.101
+172.16.3.102
+172.16.3.103
+
+[workers]
+172.16.3.104
+172.16.3.105
+172.16.3.106
+172.16.3.107
+
+[cluster]
+172.16.3.101
+172.16.3.102
+172.16.3.103
+172.16.3.104
+172.16.3.105
+172.16.3.106
+172.16.3.107
+
+[all:vars]
+ansible_connection=ssh
+ansible_python_interpreter=/usr/bin/python3
+
