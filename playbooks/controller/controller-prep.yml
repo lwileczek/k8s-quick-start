@@ -1,0 +1,50 @@
+---
+# Download the few tools we'll need to set up the controller box to issue
+# kubespray commands and control the the cluster. 
+
+- hosts: controllers
+  remote_user: root
+  tasks:
+      - name: Update & upgrade apt, install python 
+        apt:
+            name: ['python3-pip', 'git']
+            state: present
+
+      - name: Upgrade Pip
+        shell: pip3 install --upgrade pip
+
+      - name: Clone Kubespray Repo
+        git:
+            repo: 'https://github.com/kubernetes-sigs/kubespray.git'
+            dest: /root/kubespray
+
+      - name: Install Required Packages
+        shell: pip install -r requirements.txt
+        args:
+            chdir: kubespray/
+
+      - name: Copy Inventory File
+        copy:
+            src: /root/kubespray/inventory/sample
+            dest: /root/kubespray/inventory/mycluster
+            remote_src: yes
+
+      - name: Send list of IPs
+        lineinfile:
+            path: "/root/ip_list"
+            create: yes
+            line: "{{ hostvars[item].ansible_host }}"
+        with_items:
+            - "{{ groups['cluster'] }}"
+
+      - name: Generate SSH key
+        openssh_keypair:
+          path: "~/.ssh/id_rsa"
+          mode: 0600
+
+      - name: Fetch Public key
+        fetch:
+            src: "~/.ssh/id_rsa.pub"
+            dest: "/tmp/ctl-id_rsa.pub"
+            flat: yes
+

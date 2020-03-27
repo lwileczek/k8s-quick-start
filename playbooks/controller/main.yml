@@ -1,31 +1,7 @@
 ---
+# Setting up the controller and cluster to start a kubespray execution
 
-- hosts: controller
-  remote_user: root
-  tasks:
-      - name: Update & upgrade apt, install python 
-        apt:
-            name: python3-pip
-            state: present
+- import_playbook: controller-prep.yml
 
-      - name: Clone Kubespray Repo
-        git:
-            repo: 'https://github.com/kubernetes-sigs/kubespray.git'
-            dest: /root/kubespray
-
-      - name: Generate SSH key
-        openssh_keypair:
-          path: /root/.ssh/id_rsa
-          mode: 0600
-
-- hosts: cluster
-  vars:
-      controller_host: 127.0.0.1
-  tasks:
-      - name: Distribute the key
-        authorized_key:
-            delegate_to: "{{ controller }}"
-            user: '{{ deploy_user }}'
-            state: present
-            key: "{{ lookup('file', '/home/{{ deploy_user  }}/.ssh/id_rsa.pub') }}"
+- import_playbook: cluster-prep.yml
 
