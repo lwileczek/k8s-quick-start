@@ -9,7 +9,22 @@ where ansible is not already installed.
 
 ### Kubespray
 
-This is currently mapped to the [Kubspray](https://kubespray.io/#/) version 2.1.12
+[Kubspray](https://kubespray.io/#/) is a collection of ansible scripts to make
+it easier to deploy kubernetes.  Kubespray sets up templates as well which make
+it easy to customize your deployment to your needs.  As of now, the kubespray
+branchs map to these versions of kubernetes:
+
+  - kubespray 2.1.12 => kubernetes 1.17
+  - kubespray 2.1.11 => kubernetes 1.15.11
+  - kubespray 2.1.10 => kubernetes 1.14.6
+  - kubespray 2.1.9  => kubernetes 1.13.5
+
+This can be found and changed in the file:
+`kubespray/inventory/sample/group_vars/k8s-cluster/k8s-cluster.yml`
+That being said, the version of other tools are configured to work together
+withing kubespray, so it's probably better to use the corresponding version of
+kubespray rather than change the value yourself, e.g. use kuberspray 2.1.12 &
+kubernetes 1.14.
 
 ### Why Remote Controller
 
@@ -21,7 +36,6 @@ don't need to remember.  This should set up remote controller in the cloud with
 Once you SSH to the controller server
 
 ```sh
-cp -rfp inventory/sampel inventory/mycluster
 declare -a IPS=(...)
 CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
 ```
