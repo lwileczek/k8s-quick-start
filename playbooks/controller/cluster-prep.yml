@@ -15,12 +15,6 @@
             state: present
             key: "{{ lookup('file', '/tmp/ctl-id_rsa.pub') }}"
 
-      - name: Distribute the key to root
-        authorized_key:
-            user: root
-            state: present
-            key: "{{ lookup('file', '/tmp/ctl-id_rsa.pub') }}"
-
       - name: Make sure we have a 'wheel' group
         group:
           name: wheel

@@ -25,7 +25,7 @@
 
       - name: Copy Inventory File
         copy:
-            src: /root/kubespray/inventory/sample
+            src: /root/kubespray/inventory/sample/
             dest: /root/kubespray/inventory/mycluster
             remote_src: yes
 
