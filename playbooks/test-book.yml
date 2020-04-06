@@ -1,0 +1,22 @@
+---
+# Update & Upgrade a fresh box -- Ubuntu | Debian
+
+- hosts: all
+  remote_user: root
+  vars:
+     main_nodes_ips: "{{ groups['all'] | map('extract', hostvars, ['ansible_host']) | join(' ') }}"
+  tasks:
+
+      - name: Set Varialbe
+        shell: export IPS="({{ main_nodes_ips }})"
+        
+      - debug: var=main_nodes_ips
+
+        # - name: Send list of IPs
+        #   lineinfile:
+        #       path: "/root/ip_list"
+        #       create: yes
+        #       line: "{{ hostvars[item].ansible_host }}"
+        #   with_items:
+        #       - "{{ groups['cluster'] }}"
+        # shell: echo IPS=({{ main_nodes_ips|quote }})
