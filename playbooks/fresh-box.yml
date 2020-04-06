@@ -1,5 +1,8 @@
 ---
-# Update & Upgrade a fresh box -- Ubuntu | Debian
+# fresh-box.yml
+#
+# Update the cache and upgrade programs on a fresh Ubuntu or Debian VM
+# Add a user on each node that will be used
 
 - hosts: all
   remote_user: root

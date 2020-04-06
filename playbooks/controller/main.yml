@@ -1,5 +1,15 @@
 ---
+# main.yml
+#
 # Setting up the controller and cluster to start a kubespray execution
+#
+# Assumptions:
+# Fresh-box.yml has been run to update cache and upgrade packages
+#
+# Variables:
+# `release_branch`: branch/release of kubespray to use. Default: release-2.12
+# `my_cluster_name`: arbitrary name for your cluster to be used in folder
+#                    structure on the controller. Default: mycluster
 
 - import_playbook: controller-prep.yml
 

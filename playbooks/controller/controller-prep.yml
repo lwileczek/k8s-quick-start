@@ -93,14 +93,6 @@
             src: '{{ playbook_dir }}/../../files/remote_tasks.sh'
             dest: /root/remote_tasks.yml
 
-      - name: Send list of IPs
-        lineinfile:
-            path: "/root/ip_list"
-            create: yes
-            line: "{{ hostvars[item].ansible_host }}"
-        with_items:
-            - "{{ groups['cluster'] }}"
-
       - name: Generate SSH key
         openssh_keypair:
           path: "~/.ssh/id_rsa"
