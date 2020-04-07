@@ -24,6 +24,7 @@
     release_branch: release-2.12
     my_cluster_name: mycluster
     cluster_nodes_ips: "{{ groups['cluster'] | map('extract', hostvars, ['ansible_host']) | join(' ') }}"
+    master_node: "{{ hostvars['master-0'].ansible_host }}"
   tasks:
       - name: Update & upgrade apt, install python 
         apt:
@@ -103,4 +104,15 @@
             src: "~/.ssh/id_rsa.pub"
             dest: "/tmp/ctl-id_rsa.pub"
             flat: yes
+
+      - name: Write file to get kube config
+        blockinfile:
+            path: /root/get_config.sh
+            create: yes
+            block: |
+                mkdir /root/.kube
+                ssh {{ deploy_user }}@{{ master_node}} sudo cp /etc/kubernetes/admin.conf /home/{{ deploy_user }}/config
+                ssh {{ deploy_user }}@{{ master_node}} sudo chmod +r /home/{{ deploy_user }}/config
+                scp {{ deploy_user }}@{{ master_node}}:/home/{{ deploy_user }}/config /root/.kube/config
+                ssh {{ deploy_user }}@{{ master_node}} sudo rm /home/{{ deploy_user }}/config
 

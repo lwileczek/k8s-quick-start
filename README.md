@@ -19,7 +19,7 @@ it easier to deploy kubernetes.  Kubespray sets up templates as well which make
 it easy to customize your deployment to your needs.  As of now, the kubespray
 branchs map to these versions of kubernetes:
 
-  - kubespray 2.1.12 => kubernetes 1.17
+  - kubespray 2.1.12 => kubernetes 1.16.8
   - kubespray 2.1.11 => kubernetes 1.15.11
   - kubespray 2.1.10 => kubernetes 1.14.6
   - kubespray 2.1.9  => kubernetes 1.13.5
@@ -48,7 +48,8 @@ $ ansible-playbook -i inventory/mycluster/hosts.yml --become --become-user=root 
 ### Kubectl
 
 To control the cluster you'll need to make the `.kube` directory and get the `/etc/kubernetes/admin.conf` file from 
-one of the master nodes. 
+one of the master nodes.  You can do this by running `get_config.sh` on the
+contoller server which will perform the following commands:
 
 ```shell
 $ ssh {{ master_node_ip }} sudo cp /etc/kubernetes/admin.conf /home/{{ deploy_user }}/config
@@ -61,4 +62,5 @@ $ ssh {{ master_node_ip }} rm -r /home/{{ deploy_user }}/config
 Make sure to fill in `master_node_ip` and `deploy_user` with your specific
 information.  Now you can test to make sure it's working with `$ kubectl get nodes` or 
 `kubectl -n kube-system get pods`
+
 
