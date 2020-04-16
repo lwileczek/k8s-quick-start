@@ -59,9 +59,15 @@
             version: '{{ release_branch }}'
 
       - name: Install Required Packages
-        shell: pip install -r requirements.txt
-        args:
-            chdir: kubespray/
+        pip:
+            requirements: /root/kubespray/requirements.txt
+            executable: pip3
+
+      - name: Check Cryptography Version
+        pip:
+            executable: pip3
+            name: 
+             - cryptography>=2.5  # On Debian 9 crypto 1.X is installed by default
 
       - name: Copy Inventory Folder
         copy:
@@ -104,6 +110,7 @@
         blockinfile:
             path: /root/get_config.sh
             create: yes
+            mode: '0754'
             block: |
                 mkdir /root/.kube
                 ssh {{ deploy_user }}@{{ master_node}} sudo cp /etc/kubernetes/admin.conf /home/{{ deploy_user }}/config
