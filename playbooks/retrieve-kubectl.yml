@@ -1,0 +1,46 @@
+---
+
+- hosts: controller
+  remote_user: root
+  vars: 
+    release_branch: release-2.12
+    cluster_name: mycluster
+    cluster_nodes_ips: "{{ groups['cluster'] | map('extract', hostvars, ['ansible_host']) | join(' ') }}"
+    master_node: "{{ hostvars['master-0'].ansible_host }}"
+  tasks:
+      - name: Update & upgrade apt, install python 
+        apt:
+            name: ['python3-pip', 'git', 'curl', 'apt-transport-https', 'gnupg2']
+            state: present
+
+     - name: Get Kubectl apt-key
+       apt_key:
+           url: https://packages.cloud.google.com/apt/doc/apt-key.gpg 
+           state: present
+
+     - name: Add Deb to source list
+       lineinfile:
+           path: /etc/apt/sources.list.d/kubernetes.list
+           create: yes
+           state: present
+           line: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+
+     - name: Install Kubectl
+       apt:
+           name: 'kubectl'
+           state: present
+           update_cache: yes
+
+     somewhere else if I don't use kubespray in the future.
+     - name: Write file to get kube config
+       blockinfile:
+           path: /root/get_config.sh
+           create: yes
+           mode: '0754'
+           block: |
+               mkdir /root/.kube
+               ssh {{ deploy_user }}@{{ master_node}} sudo cp /etc/kubernetes/admin.conf /home/{{ deploy_user }}/config
+               ssh {{ deploy_user }}@{{ master_node}} sudo chmod +r /home/{{ deploy_user }}/config
+               scp {{ deploy_user }}@{{ master_node}}:/home/{{ deploy_user }}/config /root/.kube/config
+               ssh {{ deploy_user }}@{{ master_node}} sudo rm /home/{{ deploy_user }}/config
+

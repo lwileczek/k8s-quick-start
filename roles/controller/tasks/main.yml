@@ -1,0 +1,18 @@
+---
+# roles/controller/tasks/main.yml
+# Setup a jump server and connect it to your cluster
+# Prepare the jump server to launch kubespray
+#
+- name: Setup Jump Server, The `Controller`
+  import_tasks: redhat_controller.yml
+  when: 
+   - ansible_facts['os_family']|lower == 'redhat'
+   - "{{ inventory_hostname in groups['controller'] }}"
+- import_tasks: debian_controller.yml
+  when: 
+   - ansible_facts['os_family']|lower == 'debian'
+   - "{{ inventory_hostname in groups['controller'] }}"
+- name: Pass Public key and remove root ssh access
+  import_tasks: cluster-prep.yml
+  when: "{{ inventory_hostname in groups['cluster'] }}"  
+

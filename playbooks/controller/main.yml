@@ -11,7 +11,21 @@
 # `my_cluster_name`: arbitrary name for your cluster to be used in folder
 #                    structure on the controller. Default: mycluster
 
-- import_playbook: controller-prep.yml
+- hosts: all
+  vars: 
+    cluster_nodes_ips: "{{ groups['cluster'] | map('extract', hostvars, ['ansible_host']) | join(' ') }}"
+    master_node: "{{ hostvars['master-0'].ansible_host }}"
+  tasks:
+    - import_role:
+        name: controller
+        when: 
+            - "'cluster' in group_names"
+            - "'controller' in group_names"
 
-- import_playbook: cluster-prep.yml
+     - name: " -- Error Message -- "
+       debug:
+           msg: "Either `cluster` or `controller` group Does not exist"
+           when: 
+               - "'cluster' not in group_names"
+               - "'controller' not in group_names"
 
