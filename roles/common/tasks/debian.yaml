@@ -1,0 +1,15 @@
+# roles/common/tasks/debian.yaml
+# Update the package manager on a fresh box
+#
+# Assumptions:
+#   - Freshly deployed box running a debian based OS 
+- name: Update the Cache
+  apt: 
+      name: python3-apt
+      state: present
+      update_cache: yes
+
+- name: Upgrade System Packages
+  apt: 
+      upgrade: full
+

@@ -1,0 +1,12 @@
+---
+# roles/common/tasks/alpine.yaml
+# Update the package manager on a fresh box
+#
+# Assumptions:
+#   - Freshly deployed box running a alpine based OS 
+
+- name: Upgrade System Packages
+  apk: 
+      upgrade: full
+      update_cache: yes
+

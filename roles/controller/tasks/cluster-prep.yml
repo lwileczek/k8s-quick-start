@@ -8,40 +8,37 @@
 # Example invocation
 # ansible-playbook playbook/controller/prep-cluster.yml
 
-- hosts: cluster
-  remote_user: root
-  tasks:
-      - name: Distribute the key
-        authorized_key:
-            user: '{{ deploy_user }}'
-            state: present
-            key: "{{ lookup('file', '/tmp/ctl-id_rsa.pub') }}"
+- name: Distribute the key
+  authorized_key:
+      user: '{{ deploy_user }}'
+      state: present
+      key: "{{ lookup('file', '/tmp/ctl-id_rsa.pub') }}"
 
-      - name: Make sure we have a 'wheel' group
-        group:
-          name: wheel
-          state: present
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
 
-      - name: Add Unix Admins users
-        user: 
-            name: '{{ deploy_user }}' 
-            append: yes
-            groups: wheel
+- name: Add Unix Admins users
+  user: 
+      name: '{{ deploy_user }}' 
+      append: yes
+      groups: wheel
 
-      - name: Allow 'wheel' group to have passwordless sudo
-        lineinfile:
-            dest: /etc/sudoers
-            state: present
-            regexp: '^%wheel'
-            line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
 
-      - name: Add sudoers users to wheel group
-        user: name=deployer groups=wheel append=yes state=present createhome=yes
+- name: Add sudoers users to wheel group
+  user: name=deployer groups=wheel append=yes state=present createhome=yes
 
-      - name: Disallow root SSH access
-        lineinfile: 
-          dest: /etc/ssh/sshd_config
-          regexp: "^PermitRootLogin"
-          line: "PermitRootLogin no"
-          state: present
+- name: Disallow root SSH access
+  lineinfile: 
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
 

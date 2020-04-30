@@ -18,14 +18,4 @@
   tasks:
     - import_role:
         name: controller
-        when: 
-            - "'cluster' in group_names"
-            - "'controller' in group_names"
-
-     - name: " -- Error Message -- "
-       debug:
-           msg: "Either `cluster` or `controller` group Does not exist"
-           when: 
-               - "'cluster' not in group_names"
-               - "'controller' not in group_names"
 

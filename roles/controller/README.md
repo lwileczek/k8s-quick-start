@@ -22,5 +22,5 @@ user the flexibility to make last minute changes before deploying.
   - cluster\_name:  The name of the cluster that will be passed to kubespray.
     Default: `mycluster`
   - release\_branch: The branch of Kubesrpay to use. Default: `release-2.12`
-  - node\_os:  The os of the systems you are deploying to. Default: `ubuntu`
+
 

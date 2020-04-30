@@ -1,0 +1,12 @@
+---
+- hosts: controller
+  tasks:
+      - shell: "printf {{ ansible_env.HOME }}/kubespray/inventory/mycluster/hosts.yml"
+        register: result
+
+      - name: Look up value
+        debug:
+            msg: "{{ result }}"
+
+
+        # msg: "{{ lookup('env', 'HOME') }}"

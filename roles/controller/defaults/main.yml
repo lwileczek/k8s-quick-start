@@ -1,6 +1,5 @@
 # Defaults/main.yml -- Default settings for setting up a jump server with
 # kubespray
-node_os: ubuntu  # Currently no other os has been tested. Debian _may_ work.
 deploy_user: devops-admin
 cluster_name: mycluster
 release_branch: release-2.12

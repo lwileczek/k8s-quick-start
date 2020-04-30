@@ -25,17 +25,17 @@
     state: present
 
 - name: Upgrade Pip
-shell: pip3 install --upgrade pip
+  shell: pip3 install --upgrade pip
 
 - name: Clone Kubespray Repo
   git:
     repo: 'https://github.com/kubernetes-sigs/kubespray.git'
-    dest: ~/kubespray
+    dest: ${HOME}/kubespray
     version: '{{ release_branch }}'
 
 - name: Install Required Packages
   pip:
-    requirements: ~/kubespray/requirements.txt
+    requirements: ${HOME}/kubespray/requirements.txt
     executable: pip3
 
 - name: Check Cryptography Version
@@ -46,25 +46,25 @@ shell: pip3 install --upgrade pip
 
 - name: Copy Inventory Folder
   copy:
-    src: ~/kubespray/inventory/sample/
-    dest: ~/kubespray/inventory/{{ cluster_name }}
+    src: "${HOME}/kubespray/inventory/sample/"
+    dest: "${HOME}/kubespray/inventory/{{ cluster_name }}"
     remote_src: yes
 
 - name: Ensure Hosts File Does Not Exist
   file:
-    path: ~/kubespray/inventory/{{ cluster_name }}/hosts.yml
+    path: "${HOME}/kubespray/inventory/{{ cluster_name }}/hosts.yml"
     state: absent
 
 - name: Generate Inventory File Contents
   command: 
     cmd: python3 contrib/inventory_builder/inventory.py {{ cluster_nodes_ips }}
-    chdir: ~/kubespray
-environment: 
-    CONFIG_FILE: ~/kubespray/inventory/{{ cluster_name }}/hosts.yml
+    chdir: "${HOME}/kubespray"
+  environment: 
+    CONFIG_FILE: "{{ ansible_env.HOME }}/kubespray/inventory/{{ cluster_name }}/hosts.yml"
 
 - name: Add my specific requirenments for connection to cluster
-blockinfile:
-    path: ~/kubespray/inventory/{{ cluster_name }}/group_vars/all/all.yml
+  blockinfile:
+    path: "${HOME}/kubespray/inventory/{{ cluster_name }}/group_vars/all/all.yml"
     block: |
         ansible_user: {{ deploy_user }}
         ansible_connection: ssh
@@ -72,24 +72,24 @@ blockinfile:
 
 - name: Update Kubespray to get Kubectl
   lineinfile:
-    path: ~/kubespray/inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
+    path: "${HOME}/kubespray/inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml"
     regexp: 'kubectl_localhost:'
     line: 'kubectl_localhost: true'
 
 - name: Update Kubespray to retrieve admin.conf
   lineinfile:
-    path: ~/kubespray/inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
+    path: "${HOME}/kubespray/inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml"
     regexp: 'kubeconfig_localhost:'
     line: 'kubeconfig_localhost: true'
 
 - name: Generate SSH key
   openssh_keypair:
-  path: "~/.ssh/id_rsa"
-  mode: 0600
+    path: "${HOME}/.ssh/id_rsa"
+    mode: 0600
 
 - name: Fetch Public key
   fetch:
-    src: "~/.ssh/id_rsa.pub"
+    src: "${HOME}/.ssh/id_rsa.pub"
     dest: "/tmp/ctl-id_rsa.pub"
     flat: yes
 
