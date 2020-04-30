@@ -1,0 +1,12 @@
+---
+# roles/common/tasks/redhat.yaml
+# Update the package manager on a fresh box
+#
+# Assumptions:
+#   - Freshly deployed box running a debian based OS 
+- name: Upgrade System Packages
+  yum: 
+      name: '*'
+      state: latest
+      update_cache: yes
+

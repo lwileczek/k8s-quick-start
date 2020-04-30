@@ -1,0 +1,32 @@
+
+# Depending the OS to get the package manager right
+- import_tasks: redhat.yaml
+  when: ansible_facts['os_family']|lower == 'redhat'
+- import_tasks: debian.yaml
+  when: ansible_facts['os_family']|lower == 'debian'
+- import_tasks: alpine.yaml
+  when: ansible_facts['os_family']|lower == 'alpine'
+
+- name: Install Common Packages
+  package:
+      name: [gcc, python3, python3-setuptools, python3-pip, acct, ntp, dnsutils, iftop, wget, apt-transport-https, ca-certificates, curl, jq, software-properties-common, libssl-dev]
+      state: present
+  ignore_errors: yes  # not sure if apt-transport-https will work for non-debian distros
+
+# Debian does not have wheel active by default
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+  
+- name: Make remote user
+  user:
+      name: '{{ deploy_user }}'
+      group: wheel
+      state: present
+      shell: /bin/bash
+      createhome: yes
+      home: '/home/{{ deploy_user }}'
+      comment: "Privilaged User"
+      expires: 1609507559  # time since epoch, 1/2021
+

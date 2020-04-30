@@ -1,0 +1,6 @@
+# Defaults/main.yml -- Default settings for setting up a jump server with
+# kubespray
+deploy_user: devops-admin
+cluster_name: mycluster
+release_branch: release-2.12
+
