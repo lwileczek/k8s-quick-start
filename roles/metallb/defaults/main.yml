@@ -1,0 +1,15 @@
+---
+metallb:
+    version: v0.9.3
+    address_pools:
+        - name: development
+          ip_range: "10.203.20.0/24"
+          auto_assign: True
+        - name: Public
+          ip_range: "84.64.44.24-84.64.44.28"  # example IPs which can be provided via
+          auto_assign: False # if leased set to False https://metallb.universe.tf/configuration/
+          # avoid-buggy-ips: true   #  if issues with .0 or .255
+    limits:
+        cpu: "100m"
+        memory: "100Mi"
+

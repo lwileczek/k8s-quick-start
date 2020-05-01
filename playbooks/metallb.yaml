@@ -1,0 +1,8 @@
+---
+- hosts: cluster
+  vars: 
+    useless: 'hello'
+  tasks:
+    - import_role:
+        name: metallb
+
