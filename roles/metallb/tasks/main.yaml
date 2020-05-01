@@ -1,0 +1,22 @@
+---
+- name: "Copy MetalLB Manifests"
+  become: true
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ ansible_env.HOME }}/{{ item }}"
+  loop:
+    - bootstrap-metallb.yml
+    - metallb-config.yml
+  register: "rendering"
+  when:
+    - "inventory_hostname == groups['masters'][0]"
+
+- name: "Install MetalLB"
+  shell: kubectl apply -f {{ansible_env.HOME}}/{{ item.item }}
+  loop: "{{ rendering.results }}"
+  when:
+    - "inventory_hostname == groups['masters'][0]"
+
+- name: "MetalLB Secrets"
+  shell: kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+

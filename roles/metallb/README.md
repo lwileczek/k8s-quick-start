@@ -24,3 +24,12 @@ ipvs:
   strictARP: true
 ```
 
+# Load Balancer
+This does not deploy a generic load balancer but provides the ability to expose a deployment as `--type=LoadBalancer`. 
+For example, after this runs you could do something like:
+
+```sh
+$ kubectl create deployment nginx --image=nginx
+$ kubectl expose deployment nginx --port=80 --type=LoadBalancer
+```
+

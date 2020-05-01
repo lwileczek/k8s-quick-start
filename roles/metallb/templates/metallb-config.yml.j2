@@ -11,7 +11,7 @@ data:
     - name: {{ address_pool.name }}
       protocol: layer2
       addresses:
-      - {{ metallb.ip_range }}
-      auto-assign: {{ metallb.auto-assign }}
+      - {{ address_pool.ip_range }}
+      auto-assign: {{ address_pool.auto_assign }}
 {% endfor %}
 
