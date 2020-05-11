@@ -134,3 +134,6 @@ inventory/hosts
 # Random thoughts and tasks
 my_notes.md
 
+# Vim
+*.swp
+
