@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install Kubernetes inside a CentOS container
+# Install Kubernetes inside a ubuntu container
 # Works for both Master and Worker nodes based off of the name of the container.
 # Need at least one master and one worker to have a functioning cluster.
 # Suggested using at least one master and two workers for testing purposes. 
@@ -19,7 +19,7 @@
 #   | kworker0 | RUNNING | 172.18.66.69 (eth0)  | fd42:1a11:f361:fc2f:216:3eff:fe40:6f76 (eth0) | PERSISTENT | 0         |
 #   +----------+---------+----------------------+-----------------------------------------------+------------+-----------+
 #   
-#   $ cat bootstrap-kube-cenos.sh | lxc exec kmaster bash
+#   $ cat bootstrap-kube-ubuntu.sh | lxc exec kmaster bash
 #   [TASK 1] Install docker container engine
 #   [TASK 2] Enable and start docker service
 #   [TASK 3] Add apt repo file for kubernetes
@@ -70,14 +70,11 @@ EOF
 
 mkdir -p /etc/systemd/system/docker.service.d
 
-# Restart docker.
-systemctl daemon-reload
-systemctl restart docker
 
 # Enable docker service
 echo "[TASK 2] Enable and start docker service"
-# systemctl enable docker >/dev/null 2>&1
-# systemctl start docker
+systemctl daemon-reload
+systemctl restart docker
 
 # Add APT repo file for Kubernetes
 echo "[TASK 3] Add apt repo file for kubernetes"
@@ -88,36 +85,52 @@ deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 
 # Install Kubernetes
+#TODO: Download k8s tree and set version number for installation
+#  StackOverflow: https://stackoverflow.com/questions/49721708/how-to-install-specific-version-of-kubernetes
+#  Get k8s versions: curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
 echo "[TASK 4] Install Kubernetes (kubeadm, kubelet and kubectl)"
 apt-get update
-apt-get install -y kubelet kubeadm kubectl
+apt-get install -qy kubelet=1.17.6-00 kubectl=1.17.6-00 kubeadm=1.17.6-00
 apt-mark hold kubelet kubeadm kubectl
  
 # Start and Enable kubelet service
-echo "[TASK 5] Enable and start kubelet service"
-systemctl enable kubelet >/dev/null 2>&1
-echo 'KUBELET_EXTRA_ARGS="--fail-swap-on=false"' > /etc/sysconfig/kubelet
-systemctl start kubelet >/dev/null 2>&1
+# echo "[TASK 5] Enable and start kubelet service"
+# systemctl enable kubelet >/dev/null 2>&1
+# echo 'KUBELET_EXTRA_ARGS="--fail-swap-on=false"' > /etc/sysconfig/kubelet
+# systemctl start kubelet >/dev/null 2>&1
 
 # Install Openssh server
 echo "[TASK 6] Install and configure ssh"
 apt install -y -q openssh-server >/dev/null 2>&1
 sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 systemctl enable ssh >/dev/null 2>&1
-systemctl start ssh >/dev/null 2>&1
+# systemctl start ssh >/dev/null 2>&1
+systemctl restart ssh >/dev/null 2>&1
 
 # Set Root password
 echo "[TASK 7] Set root password"
-echo "kubeadmin" | passwd --stdin root >/dev/null 2>&1
+echo "root:kubeadmin" | chpasswd >/dev/null 2>&1
+
 
 # Install additional required packages
 echo "[TASK 8] Install additional packages"
 apt install -y sshpass >/dev/null 2>&1
 
 # Hack required to provision K8s v1.15+ in LXC containers
-# mknod /dev/kmsg c 1 11
-# chmod +x /etc/rc.d/rc.local
-# echo 'mknod /dev/kmsg c 1 11' >> /etc/rc.d/rc.local
+# mkdir -p /proc/sys/net/bridge
+# echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+swapoff --all
+# https://github.com/kubernetes/kubernetes/issues/53533#issuecomment-365495719
+# edit /etc/systemd/system/kubelet.service.d/conf*
+# Add --fail-swap-on=false
+# working on it. 
+sed -i -E 's/(^Environment=".*)"/\1 --fail-swap-on=false"/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+systemctl daemon-reload
+mknod /dev/kmsg c 1 11
+touch /etc/rc.local
+chmod +x /etc/rc.local
+echo 'mknod /dev/kmsg c 1 11' >> /etc/rc.local
 
 #######################################
 # To be executed only on master nodes #
@@ -159,4 +172,3 @@ then
   bash /joincluster.sh >> /tmp/joincluster.log 2>&1
 
 fi
-
