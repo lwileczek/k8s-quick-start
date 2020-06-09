@@ -1,0 +1,46 @@
+Vagrant.require_version ">= 2.0.0"
+ENV["LC_ALL"] = "en_US.UTF-8"
+Vagrant.configure("2") do |config|
+  N = 4
+  (1..N).each do |machine_id|
+    config.vm.define "machine#{machine_id}" do |machine|
+      machine.vm.box = "debian/stretch64:9.12.0"
+      machine.vm.hostname = "machine#{machine_id}"
+      machine.vm.network "private_network", ip: "192.168.93.#{20 + machine_id}"
+      machine.vm.network "private_network", ip: "192.168.93.#{20 + machine_id}", auto_config: false
+
+      if machine_id == 2
+        machine.vm.network "forwarded_port", guest: 80, host: 8080
+      end
+
+      machine.vm.provider "virtualbox" do |vb|
+        # Deployment Node
+        if machine_id == 1
+          vb.memory = "512"
+        elsif machine_id == 2 
+          # Master node
+          vb.memory = "4096"
+        else
+          # Compute nodes
+          vb.memory = "2048"
+        end
+      end
+
+      # Only execute once the Ansible provisioner,
+      # when all the machines are up and ready.
+      if machine_id == N
+        machine.vm.provision :ansible do |ansible|
+          # Disable default limit to connect to all the machines
+          ansible.compatibility_mode = "2.0"
+          ansible.limit = "all"
+          ansible.playbook = "ansible/playbook.yaml"
+          ansible.groups = {
+            "deployer" => ["machine1"],
+            "controller"  => ["machine2", "machine3"],
+            "compute"  => ["machine4", "machine5"],
+          }
+        end
+      end
+    end
+  end
+end
