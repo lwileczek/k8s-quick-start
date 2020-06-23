@@ -48,10 +48,10 @@
 
 # Install docker from Docker-ce repository
 echo "[TASK 1] Install docker container engine"
-apt-get install -y  apt-transport-https  ca-certificates  curl  gnupg-agent  software-properties-common
+apt-get -qq install -y  apt-transport-https  ca-certificates  curl  gnupg-agent  software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt-get update && apt-get install -y \
+apt-get -qq update && apt-get -qq install -y \
   containerd.io=1.2.13-1 \
   docker-ce=5:19.03.8~3-0~ubuntu-$(lsb_release -cs) \
   docker-ce-cli=5:19.03.8~3-0~ubuntu-$(lsb_release -cs)
@@ -78,7 +78,7 @@ systemctl restart docker
 
 # Add APT repo file for Kubernetes
 echo "[TASK 3] Add apt repo file for kubernetes"
-apt-get update && apt-get install -y apt-transport-https curl
+apt-get -qq update && apt-get -q install -y apt-transport-https curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF | tee /etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
@@ -101,7 +101,7 @@ apt-mark hold kubelet kubeadm kubectl
 
 # Install Openssh server
 echo "[TASK 6] Install and configure ssh"
-apt install -y -q openssh-server >/dev/null 2>&1
+apt-get install -y -q openssh-server >/dev/null 2>&1
 sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
 echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 systemctl enable ssh >/dev/null 2>&1

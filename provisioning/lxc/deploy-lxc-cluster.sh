@@ -21,16 +21,18 @@
 
 cat ldx_init.yaml | lxd init --preseed  # take our file to start lxd
 
+lxc storage create k8s-storage dir  # local storage
 lxc profile create k8s-profile
-lxc profile edit k8s-profile < k8s-profile.yaml
+cat k8s-profile.yaml | lxc profile edit k8s-profile
 
 # Launch three CentOS containers
 for node in kmaster kworker0 kworker1
 do
-    lxc launch images:centos/7 ${node} --profile k8s-profile
-    cat bootstrap-kube-centos.sh | lxc exec ${node} bash
+    lxc launch images:ubuntu/18.04 ${node} --profile k8s-profile
+    cat bootstrap-kube-ubuntu.sh | lxc exec ${node} bash
 done
 
+exit 
 # Platform agnositc kubectl download
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 # To download a specific version you can use the below replacing `v1.18.0` with
