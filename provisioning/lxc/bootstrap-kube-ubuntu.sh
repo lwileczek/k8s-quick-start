@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # Install Kubernetes inside a ubuntu container
 # Works for both Master and Worker nodes based off of the name of the container.
 # Need at least one master and one worker to have a functioning cluster.
@@ -90,7 +90,8 @@ EOF
 #  Get k8s versions: curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
 echo "[TASK 4] Install Kubernetes (kubeadm, kubelet and kubectl)"
 apt-get update
-apt-get install -qy kubelet=1.17.6-00 kubectl=1.17.6-00 kubeadm=1.17.6-00
+# apt-get install -qy kubelet=1.17.6-00 kubectl=1.17.6-00 kubeadm=1.17.6-00
+apt-get install -qy kubelet=1.19.5-00 kubectl=1.19.5-00 kubeadm=1.19.5-00
 apt-mark hold kubelet kubeadm kubectl
  
 # Start and Enable kubelet service
