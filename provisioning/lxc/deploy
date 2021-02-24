@@ -15,14 +15,22 @@
 #
 # Invoke:
 # ./deploy
-lxc storage create k8s-storage dir  # local storage
-cat lxd-init.yaml | lxd init --preseed  # take our file to start lxd
+# lxc storage create k8s-storage dir  # local storage
+# cat lxd-init.yaml | lxd init --preseed  # take our file to start lxd
+
+OS="centos"
 
 # Launch three CentOS containers
-for node in kmaster kworker0 kworker1
+for node in ckmaster ckworker0 ckworker1
 do
-    lxc launch images:ubuntu/18.04 ${node} --profile k8s-profile
-    cat bootstrap-kube-ubuntu.sh | lxc exec ${node} bash
+    if [[ $OS -eq "centos" ]]; then
+        lxc launch images:centos/7 ${node} --profile k8s-profile
+        cat bootstrap-kube-centos.sh | lxc exec ${node} bash
+    else
+        lxc launch images:ubuntu/18.04 ${node} --profile k8s-profile
+        cat bootstrap-kube-ubuntu.sh | lxc exec ${node} bash
+    fi
+
 done
 
 exit 

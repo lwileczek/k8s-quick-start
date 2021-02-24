@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Install Kubernetes inside a CentOS container
 # Works for both Master and Worker nodes based off of the name of the container.
 # Need at least one master and one worker to have a functioning cluster.
@@ -45,6 +44,8 @@
 #   | kworker0 | RUNNING | 172.18.66.69 (eth0)    | fd42:1a11:f361:fc2f:216:3eff:fe40:6f76 (eth0) | PERSISTENT | 0         |
 #   +----------+---------+------------------------+-----------------------------------------------+------------+-----------+
 
+# This script has been tested on Ubuntu 20.04
+# For other versions of Ubuntu, you might need some tweaking
 
 # Install docker from Docker-ce repository
 echo "[TASK 1] Install docker container engine"
@@ -109,7 +110,7 @@ then
 
   # Initialize Kubernetes
   echo "[TASK 9] Initialize Kubernetes Cluster"
-  kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all >> /root/kubeinit.log 2>&1
+  kubeadm init --pod-network-cidr=10.172.0.0/16 --ignore-preflight-errors=all >> /root/kubeinit.log 2>&1
 
   # Copy Kube admin config
   echo "[TASK 10] Copy kube admin config to root user .kube directory"
@@ -122,7 +123,7 @@ then
 
   # Generate Cluster join command
   echo "[TASK 12] Generate and save cluster join command to /joincluster.sh"
-  joinCommand=$(kubeadm token create --print-join-command 2>/dev/null) 
+  joinCommand=$(kubeadm token create --print-join-command 2>/dev/null)
   echo "$joinCommand --ignore-preflight-errors=all" > /joincluster.sh
 
 fi

@@ -136,4 +136,4 @@ my_notes.md
 
 # Vim
 *.swp
-
+nohup.out
